@@ -1,13 +1,13 @@
 % shc(1) shc user manual
 %
-% May 17, 2017
+% January 14, 2019
 <hr>
 
 # NAME
 shc - Generic shell script compiler
 
 # SYNOPSIS
-**shc** [ -e *date* ] [ -m *addr* ] [ -i *iopt* ] [ -x *cmnd* ] [ -l *lopt* ] [ -o *outfile* ] [ -ABCDhUv ] -f *script* 
+**shc** [ -e *date* ] [ -m *addr* ] [ -i *iopt* ] [ -x *cmnd* ] [ -l *lopt* ] [ -o *outfile* ] [ -ABCDhUHvSr ] -f *script* 
 
 # DESCRIPTION
 **shc** creates a stripped binary executable version of the script specified with `-f` on the command line.
@@ -27,7 +27,7 @@ thus **shc** does not create completely independent binaries.
 **shc** itself is not a compiler such as cc, it rather encodes and encrypts a shell script and generates C source code with the added expiration capability. 
 It then uses the system compiler to compile a stripped binary which behaves exactly like the original script.
 Upon execution, the compiled binary will decrypt and execute the code with the shell `-c` option.
-Unfortunatelly, it will not give you any speed improvement as a real C program would.
+Unfortunately, it will not give you any speed improvement as a real C program would.
 
 **shc**'s main purpose is to protect your shell scripts from modification or inspection.
 You can use it if you wish to distribute your scripts but don't want them to be easily readable by other people.   
@@ -61,11 +61,17 @@ You can use it if you wish to distribute your scripts but don't want them to be 
 -v
 : Verbose compilation 
 
+-S
+: Switch ON setuid for root callable programs [OFF]
+
 -D
 : Switch on debug exec calls 
 
 -U
 : Make binary to be untraceable (using *strace*, *ptrace*, *truss*, etc.) 
+
+-H
+: Hardening. Extra security flag without root access requirement that protects against dumping, code injection, `cat /proc/pid/cmdline`, ptrace, etc.. This feature is **experimental** and may not work on all systems. it require bourne shell (sh) scripts
 
 -C
 : Display license and exit 
@@ -88,6 +94,8 @@ CC
 CFLAGS
 : C compiler flags `[none]`
 
+LDFLAGS
+: Linker flags `[none]`
  
 # EXAMPLES
 
@@ -103,8 +111,13 @@ Compile an untraceable binary:
 shc -Uf myscript -o mybinary
 ```
 
+Compile an untraceable binary that doesn't require root access (experimental):
+
+```bash
+shc -Hf myscript -o mybinary
+```
  
-# BUGS
+# LIMITATIONS
 The maximum size of the script that could be executed once compiled is limited by the operating system configuration parameter `_SC_ARG_MAX` (see sysconf(2))
 
 # AUTHORS
